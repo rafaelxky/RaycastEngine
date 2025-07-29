@@ -74,11 +74,11 @@ export function shoot(enemies, player) {
     let dy = enemy.y - player.y;
     let dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < 200) {
+    if (dist < 0.8) {
       // Angle to enemy
       let angleToEnemy = Math.atan2(dy, dx);
       let diff = angleDifference(angleToEnemy, player.angle);
-      if (Math.abs(diff) < 0.1) { // roughly center of screen
+      if (Math.abs(diff) < 0.8) { // roughly center of screen
         enemy.alive = false;
       }
     }

@@ -12,11 +12,11 @@ import {
 // Canvas setup
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-canvas.width = 800;
+canvas.width = 1080;
 canvas.height = 600;
 
 const TILE_SIZE = 64;
-const FOV = Math.PI / 3;
+const FOV = Math.PI * 1.5;
 const NUM_RAYS = canvas.width;
 
 // Player object
@@ -47,6 +47,8 @@ window.addEventListener('keyup', e => {
 const enemies = [
   { x: TILE_SIZE * 3.5, y: TILE_SIZE * 2.5, alive: true },
   { x: TILE_SIZE * 5.5, y: TILE_SIZE * 4.5, alive: true },
+  { x: TILE_SIZE * 2.5, y: TILE_SIZE * 7.5, alive: true },
+  { x: TILE_SIZE * 6, y: TILE_SIZE * 12.5, alive: true },
 ];
 
 // Check line of sight between player and enemy, avoid drawing if occluded
@@ -74,7 +76,7 @@ function shoot(enemies, player) {
     if (dist < 200) {
       let angleToEnemy = Math.atan2(dy, dx);
       let diff = angleDifference(angleToEnemy, player.angle);
-      if (Math.abs(diff) < 0.1) { // close to center
+      if (Math.abs(diff) < 0.8) { // close to center
         enemy.alive = false;
       }
     }
@@ -141,10 +143,67 @@ function onMouseMove(e) {
   player.angle = normalizeAngle(player.angle);
 }
 
-// Shoot on mouse left click
+// Load gun image
+const gunImage = new Image();
+gunImage.src = 'gun.png';
+
+const flashImage = new Image();
+flashImage.src = 'flash.png';
+
+const FLASH_DURATION = 5; // frames
+let flashTime = 0;
+
+// Gun animation variables
+let gunRecoilTime = 0;         // time left for recoil animation in frames
+const GUN_RECOIL_DURATION = 15; // frames duration for recoil animation
+const GUN_BASE_Y = canvas.height - 120; // base vertical position of the gun image
+const GUN_X = canvas.width / 2;           // horizontal center
+
+// On mouse down (left click), start recoil animation
 canvas.addEventListener('mousedown', e => {
-  if (e.button === 0) shoot(enemies, player);
+  if (e.button === 0) {
+    shoot(enemies, player);      // your existing shoot call
+    gunRecoilTime = GUN_RECOIL_DURATION; // start recoil animation
+    flashTime = FLASH_DURATION;
+  }
 });
+
+// Draw gun with recoil animation
+function drawGun() {
+  if (!gunImage.complete) return;
+
+  let recoilOffset = 0;
+  if (gunRecoilTime > 0) {
+    const progress = (GUN_RECOIL_DURATION - gunRecoilTime) / GUN_RECOIL_DURATION;
+    recoilOffset = -10 * Math.sin(progress * Math.PI);
+  }
+
+  const gunWidth = 200;
+  const aspectRatio = gunImage.height / gunImage.width;
+  const gunHeight = gunWidth * aspectRatio;
+
+  const drawX = GUN_X - gunWidth / 2;
+  const drawY = GUN_BASE_Y + recoilOffset;
+
+  ctx.drawImage(gunImage, drawX, drawY, gunWidth, gunHeight);
+
+  // Draw muzzle flash
+  if (flashTime > 0 && flashImage.complete) {
+    const flashWidth = 80;
+    const flashAspect = flashImage.height / flashImage.width;
+    const flashHeight = flashWidth * flashAspect;
+
+    // Flash appears slightly above the gun muzzle
+    const flashX = GUN_X - flashWidth / 2;
+    const flashY = drawY - flashHeight + 10; // adjust as needed
+
+    ctx.drawImage(flashImage, flashX, flashY, flashWidth, flashHeight);
+    flashTime--;
+  }
+
+  if (gunRecoilTime > 0) gunRecoilTime--;
+}
+
 
 // Game loop
 function gameLoop() {
@@ -164,6 +223,9 @@ function gameLoop() {
   ctx.font = '16px monospace';
   ctx.textAlign = 'right';
   ctx.fillText(`X: ${player.x.toFixed(1)} Y: ${player.y.toFixed(1)} Angle: ${(player.angle * 180 / Math.PI).toFixed(1)}°`, canvas.width - 10, 20);
+
+  // Draw gun with animation at bottom center
+  drawGun();
 
   requestAnimationFrame(gameLoop);
 }

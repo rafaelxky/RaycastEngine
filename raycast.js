@@ -2,17 +2,26 @@
 
 // The map layout (0=empty, 1=wall)
 export const map = [
-  [1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,1],
-  [1,0,1,0,1,0,0,1],
-  [1,0,1,0,1,0,0,1],
-  [1,0,0,0,0,0,0,1],
-  [1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1], // 0
+  [1,0,0,0,0,0,0,1], // 1
+  [1,0,1,0,1,0,0,1], // 2
+  [1,0,1,0,1,0,0,1], // 3
+  [1,0,0,0,0,0,0,1], // 4
+  [1,1,1,1,0,1,1,1], // 5
+  [1,0,0,1,0,1,1,1], // 6
+  [1,0,0,1,0,1,1,1,1,1], // 7
+  [1,0,0,1,0,1,1,0,0,1], // 8
+  [1,0,0,1,0,1,1,1,0,1], // 9
+  [1,0,0,0,0,1,0,0,0,1], // 10
+  [1,1,1,1,0,0,0,0,0,1], // 11
+  [1,1,1,1,0,1,0,1,1,1], // 12
+  [1,1,1,1,0,1,1,1],
 ];
 
 export const MAX_DEPTH = 1000;
+const usesCorrection = false;
 
-export const wallDistances = new Array(800); // adjust size as needed
+export const wallDistances = new Array(800); 
 
 export function isWall(x, y, map) {
   let mapX = Math.floor(x / 64);
@@ -40,8 +49,13 @@ export function castRay(angle, player, map, rayIndex, NUM_RAYS, FOV) {
     let targetY = player.y + sin * depth;
     if (isWall(targetX, targetY, map)) {
       // Fish-eye correction: multiply by cos(rayAngle - playerAngle)
-      let correctedDist = depth * Math.cos(angleDifference(angle, player.angle));
-      wallDistances[rayIndex] = correctedDist;
+      if (usesCorrection){
+        let correctedDist = depth * Math.cos(angleDifference(angle, player.angle));
+        wallDistances[rayIndex] = correctedDist;
+      }else {
+        wallDistances[rayIndex] = depth;
+      }
+
       return { depth };
     }
   }
