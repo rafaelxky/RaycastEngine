@@ -16,6 +16,8 @@ export function spawnEnemy(x, y) {
 // Example initial spawns
 spawnEnemy(64 * 2.5, 64 * 1.5);
 spawnEnemy(64 * 5.5, 64 * 3.5);
+spawnEnemy(64 * 7, 64 * 12);
+spawnEnemy(64 * 2, 64 * 7);
 
 // Bresenham’s line for quick LOS tile check
 function hasLineOfSightBresenham(enemy, player, map) {

@@ -1,8 +1,28 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: #000;
 }
+
+body {
+  background-image: 
+    /* Gray layer with a very narrow gradient fade */
+    linear-gradient(to top, 
+                    grey 0%, 
+                    grey 48%,        /* fully gray up to about 48% */
+                    rgba(128,128,128,0.1) 50%, /* very slight fade at 50% */
+                    transparent 52%, /* almost transparent just after 50% */
+                    transparent 100%),
+    /* Image layer */
+    url('image1.jpg');
+
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+
+
 canvas {
   display: block;
   cursor: none;
