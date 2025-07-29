@@ -1,4 +1,3 @@
-// enemy.js
 import { map, isWall, angleDifference, wallDistances } from './raycast.js';
 
 export const enemies = [];
@@ -14,7 +13,7 @@ export function spawnEnemy(x, y) {
   }
 }
 
-// Spawn some enemies initially
+// Example initial spawns
 spawnEnemy(64 * 2.5, 64 * 1.5);
 spawnEnemy(64 * 5.5, 64 * 3.5);
 
@@ -56,11 +55,10 @@ export function hasLineOfSight(enemy, player, map) {
   let dy = enemy.y - player.y;
   let dist = Math.sqrt(dx * dx + dy * dy);
 
-  // Check for walls between player and enemy along line
   const steps = Math.floor(dist / 2);
   for (let i = 0; i < steps; i++) {
-    let x = player.x + (dx * i / steps);
-    let y = player.y + (dy * i / steps);
+    let x = player.x + (dx * i) / steps;
+    let y = player.y + (dy * i) / steps;
     if (isWall(x, y, map)) return false;
   }
   return true;
@@ -74,11 +72,10 @@ export function shoot(enemies, player) {
     let dy = enemy.y - player.y;
     let dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < 0.8) {
-      // Angle to enemy
+    if (dist < 200) {
       let angleToEnemy = Math.atan2(dy, dx);
       let diff = angleDifference(angleToEnemy, player.angle);
-      if (Math.abs(diff) < 0.8) { // roughly center of screen
+      if (Math.abs(diff) < 0.8) {
         enemy.alive = false;
       }
     }
@@ -98,13 +95,9 @@ export function renderEnemies(ctx, player, enemies, wallDistances, NUM_RAYS, FOV
     let angleDiff = angleDifference(angleToEnemy, player.angle);
 
     if (Math.abs(angleDiff) < FOV / 2) {
-      // Convert angleDiff to screen X coordinate
-      let screenX = (angleDiff + FOV / 2) / FOV * canvas.width;
-
-      // Calculate enemy size on screen
+      let screenX = ((angleDiff + FOV / 2) / FOV) * canvas.width;
       let size = (TILE_SIZE * 300) / dist;
 
-      // Calculate rays covering enemy width
       let rayCenter = Math.floor(((angleDiff + FOV / 2) / FOV) * NUM_RAYS);
       let halfRays = Math.floor(size / 2);
 
@@ -117,7 +110,6 @@ export function renderEnemies(ctx, player, enemies, wallDistances, NUM_RAYS, FOV
         if (dist > wallDistances[r]) occludedRays++;
       }
 
-      // Only draw enemy if less than half occluded by walls
       if (totalRays === 0 || occludedRays / totalRays < 0.5) {
         ctx.fillStyle = 'red';
         ctx.fillRect(screenX - size / 2, canvas.height / 2 - size / 2, size, size);
