@@ -1,4 +1,5 @@
 import { map, isWall, angleDifference, wallDistances } from './raycast.js';
+import { score } from "./main.js";
 
 export const enemies = [];
 
@@ -18,6 +19,7 @@ spawnEnemy(64 * 2.5, 64 * 1.5);
 spawnEnemy(64 * 5.5, 64 * 3.5);
 spawnEnemy(64 * 7, 64 * 12);
 spawnEnemy(64 * 2, 64 * 7);
+spawnEnemy(64 * 2, 64 * 18);
 
 // Bresenham’s line for quick LOS tile check
 function hasLineOfSightBresenham(enemy, player, map) {
@@ -74,11 +76,12 @@ export function shoot(enemies, player) {
     let dy = enemy.y - player.y;
     let dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < 200) {
+    if (dist < 1000) {
       let angleToEnemy = Math.atan2(dy, dx);
       let diff = angleDifference(angleToEnemy, player.angle);
       if (Math.abs(diff) < 0.8) {
         enemy.alive = false;
+        score.value++;
       }
     }
   }

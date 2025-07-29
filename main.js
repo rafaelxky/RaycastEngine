@@ -1,3 +1,5 @@
+export let score = {value: 0};
+
 import {
   map,
   MAX_DEPTH,
@@ -18,7 +20,7 @@ canvas.width = 1080;
 canvas.height = 600;
 
 const TILE_SIZE = 64;
-const FOV = Math.PI * 1.5;
+const FOV = Math.PI;
 const NUM_RAYS = canvas.width;
 
 // Player object
@@ -149,6 +151,9 @@ function gameLoop() {
   ctx.font = '16px monospace';
   ctx.textAlign = 'right';
   ctx.fillText(`X: ${player.x.toFixed(1)} Y: ${player.y.toFixed(1)} Angle: ${(player.angle * 180 / Math.PI).toFixed(1)}°`, canvas.width - 10, 20);
+
+  ctx.textAlign = "left";
+  ctx.fillText(score.value, 10, 20);
 
   drawGun();
 
